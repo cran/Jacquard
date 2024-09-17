@@ -1,0 +1,5 @@
+export (BoxplotDelta,BoxplotTheta,CalculateMom,CalculateTheta,DeltaPair,Jacquard.cls,JointGenotypeCounts,mafvector,MakeM,PairwiseList)
+import (Rsolnp)
+importFrom("graphics", "boxplot")
+importFrom("stats", "runif")
+

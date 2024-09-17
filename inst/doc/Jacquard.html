@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Jan Graffelman - Dpt. of Statistics, Universitat Politecnica de Catalunya; Dpt. of Biostatistics, University of Washington" />
+
+<meta name="date" content="2024-09-17" />
+
+<title>The Jacquard package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">The Jacquard package</h1>
+<h4 class="author">Jan Graffelman - Dpt. of Statistics, Universitat
+Politecnica de Catalunya; Dpt. of Biostatistics, University of
+Washington</h4>
+<h4 class="date">2024-09-17</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<div style="text-align: justify">
+<p>This document explains the basic functionality of the
+<strong>Jacquard</strong> package which provides functions for the
+estimation of the nine condensed Jacquard coefficients (<span class="citation">Jacquard (1974)</span>) for biallelic genetic marker
+data using a constrained least squares approach (<span class="citation">Graffelman, Weir, and Goudet (2024)</span>).</p>
+<p>Outline:</p>
+<ol style="list-style-type: decimal">
+<li><p><a href="#installation">Installation</a></p></li>
+<li><p><a href="#coefficients">Estimation of the Jacquard
+coefficients</a></p></li>
+<li><p><a href="#derived">Estimation of derived relatedness
+parameters</a></p></li>
+<li><p><a href="#mom">Alternative estimation procedures</a></p></li>
+<li><p><a href="#refs">References</a></p></li>
+</ol>
+<div id="installation" class="section level2">
+<h2>1. Installation<a name="introduction"></a></h2>
+<p>The package can be installed from CRAN with the instructions</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co">#install.packages(&quot;Jacquard&quot;)</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(Jacquard)</span></code></pre></div>
+</div>
+<div id="estimation-of-jacquard-the-coefficients" class="section level2">
+<h2>2. Estimation of Jacquard the
+coefficients<a name="coefficients"></a></h2>
+<p>We illustrate the estimation of the Jacquard coefficients using
+(0,1,2) coded genotype data available in the data set
+<code>SimulatedPedigree</code>, of which we show a small part</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">data</span>(SimulatedPedigree)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>SimulatedPedigree[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt;       Family ID Father Mother Sex SNP00001 SNP00002 SNP00003 SNP00004 SNP00005</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; ID001      1  1      0      0   1        0        0        0        0        1</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; ID002      1  2      0      0   1        1        2        0        0        0</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; ID003      1  3      0      0   1        0        0        0        0        0</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; ID004      1  4      0      0   1        0        1        0        0        0</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; ID005      1  5      0      0   1        0        1        1        0        0</span></span></code></pre></div>
+<p>This matrix contains 111 individuals, spanning seven generations, in
+its rows and pedigree information plus genotype data of 20,000 SNPs in
+its columns. We first separate the pedigree information from the
+genotype information.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>Xped <span class="ot">&lt;-</span> SimulatedPedigree[,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>Xgen <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(SimulatedPedigree[,<span class="dv">6</span><span class="sc">:</span><span class="fu">ncol</span>(SimulatedPedigree)])</span></code></pre></div>
+<p>We next determine the nine joint genotype counts for all pairs of
+individuals, storing these counts in a list object with nine lower
+triangular matrices, using function <code>JointGenotypeCounts</code>.
+For efficiency, we here load the precalculated joint counts.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co">#GTC &lt;- JointGenotypeCounts(Xgen)</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">data</span>(GTC)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">names</span>(GTC)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;f0000&quot; &quot;f1111&quot; &quot;f1101&quot; &quot;f0111&quot; &quot;f0101&quot; &quot;f1100&quot; &quot;f0011&quot; &quot;f0100&quot; &quot;f0001&quot;</span></span></code></pre></div>
+<p>E.g., the counts of the major homozygote pairs for the first five
+individuals are</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>GTC[[<span class="dv">1</span>]][<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt;       ID001 ID002 ID003 ID004 ID005</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; ID001 16466     0     0     0     0</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; ID002 13987 16507     0     0     0</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; ID003 13982 13965 16440     0     0</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; ID004 13926 13951 13903 16449     0</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; ID005 14000 14063 13977 13979 16556</span></span></code></pre></div>
+<p>We create a vector with the minor allele frequency of each SNP.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>mafvec <span class="ot">&lt;-</span> <span class="fu">mafvector</span>(Xgen)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>mafvec[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt;    SNP00001    SNP00002    SNP00003    SNP00004    SNP00005 </span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; 0.004504505 0.063063063 0.045045045 0.000000000 0.013513514</span></span></code></pre></div>
+<p>We proceed to estimate the Jacquard coefficients by constrained least
+squares with function <code>Jacquard.cls</code>. For the sake of
+illustration, we take the first three founders of the pedigree, and
+subset their joint genotype counts</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>ii <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>Xped[ii,]</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt;       Family ID Father Mother Sex</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; ID001      1  1      0      0   1</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; ID002      1  2      0      0   1</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; ID003      1  3      0      0   1</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>GTCsubset <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">length =</span> <span class="dv">9</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>) {</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  GTCsubset[[k]] <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">numeric</span>(<span class="dv">3</span><span class="sc">^</span><span class="dv">2</span>), <span class="at">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  GTCsubset[[k]] <span class="ot">&lt;-</span> GTC[[k]][ii,ii]</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>}</span></code></pre></div>
+<p>We set random initial values for the Jacquard coefficients</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>delta.init <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">9</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>delta.init <span class="ot">&lt;-</span> delta.init<span class="sc">/</span><span class="fu">sum</span>(delta.init)</span></code></pre></div>
+<p>And estimate the pairwise Jacquard coefficients of the three
+pairs.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">Jacquard.cls</span>(GTCsubset,<span class="at">mafvec=</span>mafvec,</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>                       <span class="at">eps=</span><span class="fl">1e-06</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>                       <span class="at">delta.init=</span>delta.init)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt; 3 pairs 20000 SNPs</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; Processing 1 out of 3 </span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; Processing 2 out of 3 </span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; Processing 3 out of 3</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>Delta.cls <span class="ot">&lt;-</span> output<span class="sc">$</span>delta</span></code></pre></div>
+<p>Convergence of the solver can be checked by looking at the field
+<code>convergence</code>, where 0 indicates proper convergence.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>output<span class="sc">$</span>convergence</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3]</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; [1,]    0    0    0</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; [2,]    0    0    0</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; [3,]    0    0    0</span></span></code></pre></div>
+<p>Particular estimates of Jacquard coefficients can be extracted from
+the <code>Delta.cls</code> list object, which is a list of nine
+matrices. E.g., <span class="math inline">\(\Delta_9\)</span> of the
+first pair of individuals (1,2) can be extracted by</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>Delta.cls[[<span class="dv">9</span>]][<span class="dv">1</span>,<span class="dv">2</span>]</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.9999998</span></span></code></pre></div>
+<p>All nine estimates of the Jacquard coefficients can be obtained with
+function <code>DeltaPair</code></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">DeltaPair</span>(Delta.cls,<span class="dv">1</span>,<span class="dv">2</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt;        J1        J2        J3        J4        J5        J6        J7        J8 </span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; 0.0000000 0.0000000 0.0000000 0.0000001 0.0000000 0.0000001 0.0000000 0.0000000 </span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt;        J9 </span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; 0.9999998</span></span></code></pre></div>
+<p>A pairwise list of the nine Jacquard coefficients of each pair can be
+obtained with the function <code>PairwiseList</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">PairwiseList</span>(Delta.cls)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt;             J1 J2 J3 J4 J5 J6 J7 J8 J9</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; ID001-ID002  0  0  0  0  0  0  0  0  1</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; ID001-ID003  0  0  0  0  0  0  0  0  1</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; ID002-ID003  0  0  0  0  0  0  0  0  1</span></span></code></pre></div>
+<p>The full set of all pairwise Jacquard coefficients can be calculated
+with the instructions below. This result is also available in the
+precalculated data object <code>DeltaSimulatedPedigree</code>.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co">#DeltaSimulatedPedigree &lt;- Jacquard.cls(GTC,mafvec=mafvec,</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co">#                       eps=1e-06,</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#                       delta.init=delta.init)$delta</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="fu">data</span>(DeltaSimulatedPedigree)</span></code></pre></div>
+<p>Boxplots of the estimated Jacquard coefficients can be obtained with
+function <code>BoxplotDelta</code>. Separate boxplots are shown for the
+diagonals of <span class="math inline">\(\Delta_1\)</span> and <span class="math inline">\(\Delta_7\)</span>.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">BoxplotDelta</span>(DeltaSimulatedPedigree)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="estimation-of-derived-relatedness-parameters" class="section level2">
+<h2>3. Estimation of derived relatedness
+parameters<a name="derived"></a></h2>
+<p>The set of five identifiable relatedness parameters dicussed by <span class="citation">Csűrös (2014)</span>, among them coancestry and
+inbreeding coefficients, can be calculated with the function
+<code>CalculateTheta</code>.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>Theta <span class="ot">&lt;-</span> <span class="fu">CalculateTheta</span>(DeltaSimulatedPedigree)</span></code></pre></div>
+<p>E.g., estimates of the kinship coefficients of the first five
+(founder) individuals are obtained by</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>Theta[[<span class="dv">1</span>]][<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="co">#&gt;              ID001        ID002        ID003        ID004        ID005</span></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="co">#&gt; ID001 5.000001e-01 3.128504e-08 3.292970e-08 3.989484e-08 3.082953e-08</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="co">#&gt; ID002 3.128504e-08 5.000001e-01 2.763879e-08 3.754111e-08 2.416755e-08</span></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="co">#&gt; ID003 3.292970e-08 2.763879e-08 5.000001e-01 4.053117e-08 2.651516e-08</span></span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a><span class="co">#&gt; ID004 3.989484e-08 3.754111e-08 4.053117e-08 5.000000e-01 2.717388e-08</span></span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a><span class="co">#&gt; ID005 3.082953e-08 2.416755e-08 2.651516e-08 2.717388e-08 5.000000e-01</span></span></code></pre></div>
+<p>Individual inbreeding coefficients can be obtained from …</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">diag</span>(Theta[[<span class="dv">2</span>]])[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="co">#&gt;        ID001        ID002        ID003        ID004        ID005 </span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="co">#&gt; 1.364139e-07 1.239919e-07 1.321129e-07 8.864897e-08 3.719884e-08</span></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="fu">diag</span>(DeltaSimulatedPedigree[[<span class="dv">1</span>]])[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="co">#&gt;        ID001        ID002        ID003        ID004        ID005 </span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="co">#&gt; 1.180065e-07 1.189951e-07 1.110161e-07 8.204957e-08 3.442820e-08</span></span></code></pre></div>
+<p>Boxplots of identifiable relatedness parameters can be made with
+<code>BoxplotTheta</code></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">BoxplotTheta</span>(Theta)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="alternative-estimation-procedures" class="section level2">
+<h2>4. Alternative estimation procedures<a name="mom"></a></h2>
+<p>There are many estimators for coancestry and inbreeding. Function
+<code>CalculateThetaMom</code> calculates moment estimators for the five
+identifiable relatedness parameters defined by <span class="citation">Csűrös (2014)</span>.</p>
+<p>E.g., moment estimators of the kinship coefficients of the first five
+individuals are given by</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>KS.mom[[<span class="dv">1</span>]][<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="co">#&gt;            [,1]       [,2]       [,3]       [,4]       [,5]</span></span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="co">#&gt; [1,]  0.4311849 -0.1443478 -0.1436215 -0.1557858 -0.1494313</span></span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">#&gt; [2,] -0.1443478  0.4337267 -0.1438031 -0.1526993 -0.1312757</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt; [3,] -0.1436215 -0.1438031  0.4270091 -0.1645005 -0.1521547</span></span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt; [4,] -0.1557858 -0.1526993 -0.1645005  0.4059486 -0.1546964</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="co">#&gt; [5,] -0.1494313 -0.1312757 -0.1521547 -0.1546964  0.4279169</span></span></code></pre></div>
+</div>
+</div>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">5. References<a name="refs"></a></h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Csuros" class="csl-entry">
+Csűrös, M. 2014. <span>“Non-Identifiability of Identity Coefficients at
+Biallelic Loci.”</span> <em>Theoretical Population Biology</em> 92:
+22–29. <a href="https://doi.org/10.1016/j.tpb.2013.11.001">https://doi.org/10.1016/j.tpb.2013.11.001</a>.
+</div>
+<div id="ref-Graffelman2024" class="csl-entry">
+Graffelman, J., B. S. Weir, and J. Goudet. 2024. <span>“Estimation of
+Jacquard<span>’</span>s Genetic Identity Coefficients with Bi-Allelic
+Variants by Constrained Least-Squares.”</span> <em>Preprint at
+bioRxiv</em>. <a href="https://doi.org/10.1101/2024.03.25.586682">https://doi.org/10.1101/2024.03.25.586682</a>.
+</div>
+<div id="ref-Jacquard" class="csl-entry">
+Jacquard, A. 1974. <em>The Genetic Structure of Populations</em>.
+Springer-Verlag.
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
